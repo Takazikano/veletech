@@ -1,2 +1,2 @@
-# veletech
-VeleTech Servis-Prodaja RS
+# VeleTech PC Web Shop
+VeleTech Servis-Prodaja RS Website.
