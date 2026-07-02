@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="sr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Napravi porudžbinu — VeleTech</title>
+    <style>
+      body{font-family:Arial,Helvetica,sans-serif;background:#071320;color:#f4f7fb;margin:0;padding:2rem}
+      .box{max-width:1000px;margin:0 auto;background:#071827;padding:1.2rem;border-radius:12px}
+      label{display:block;margin-top:.6rem;color:#98a8bc}
+      input,textarea,select{width:100%;padding:.6rem;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:transparent;color:inherit}
+      .row{display:flex;gap:1rem}
+      .row>div{flex:1}
+      .components{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+      .actions{display:flex;gap:1rem;margin-top:1rem}
+      .btn{padding:.6rem 1rem;border-radius:8px;background:linear-gradient(135deg,#4fd1c5,#8b5cf6);color:#041018;text-decoration:none;border:none;cursor:pointer}
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <a href="index.html">← Nazad</a>
+      <h1>Napravi porudžbinu</h1>
+      <p>Unesite sve komponente koje želite naručiti i obavezne podatke kupca.</p>
+      <form id="fullOrder" onsubmit="return false;">
+        <div class="components">
+          <div>
+            <label>Procesor (CPU)</label>
+            <input id="cpu" required />
+          </div>
+          <div>
+            <label>Grafička kartica (GPU)</label>
+            <input id="gpu" required />
+          </div>
+          <div>
+            <label>Matična ploča</label>
+            <input id="mobo" required />
+          </div>
+          <div>
+            <label>RAM memorija</label>
+            <input id="ram" required />
+          </div>
+          <div>
+            <label>Skladište (SSD/HDD)</label>
+            <input id="storage" required />
+          </div>
+          <div>
+            <label>NAPAJANJE (PSU)</label>
+            <input id="psu" required />
+          </div>
+          <div>
+            <label>Kućište</label>
+            <input id="case" required />
+          </div>
+          <div>
+            <label>Hlađenje</label>
+            <input id="cooling" required />
+          </div>
+          <div style="grid-column:1 / -1">
+            <label>Dodatna oprema / ostalo</label>
+            <input id="extras" />
+          </div>
+        </div>
+
+        <h2 style="margin-top:1rem">Podaci kupca (obavezno)</h2>
+        <label>Ime i prezime</label>
+        <input id="name" required />
+        <label>Email</label>
+        <input id="email" type="email" required />
+        <label>Telefon</label>
+        <input id="phone" type="tel" required />
+        <label>Ulica i broj</label>
+        <input id="street" required />
+        <div class="row">
+          <div>
+            <label>Grad</label>
+            <input id="city" required />
+          </div>
+          <div>
+            <label>Poštanski broj</label>
+            <input id="postal" required />
+          </div>
+        </div>
+        <label>Država</label>
+        <input id="country" value="Serbia" required disabled />
+
+        <label>Napomena (opciono)</label>
+        <textarea id="notes" rows="4"></textarea>
+
+        <div class="actions">
+          <button class="btn" id="sendEmail">Pošalji email</button>
+          <button class="btn" id="download">Preuzmi narudžbinu</button>
+          <button class="btn" id="copy">Kopiraj</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      function build(){
+        const fields = ['cpu','gpu','mobo','ram','storage','psu','case','cooling','extras'];
+        let lines=['Porudžbina — VeleTech',''];
+        lines.push('Delovi:');
+        fields.forEach(f=>{ const v=document.getElementById(f).value || '-'; lines.push(`${f.toUpperCase()}: ${v}`); });
+        lines.push('');
+        lines.push('Kupac:');
+        const name=document.getElementById('name').value;
+        const email=document.getElementById('email').value;
+        const phone=document.getElementById('phone').value;
+        const street=document.getElementById('street').value;
+        const city=document.getElementById('city').value;
+        const postal=document.getElementById('postal').value;
+        const country=document.getElementById('country').value;
+        lines.push(`Ime i prezime: ${name}`);
+        lines.push(`Email: ${email}`);
+        lines.push(`Telefon: ${phone}`);
+        lines.push(`Adresa: ${street}, ${city} ${postal}, ${country}`);
+        lines.push('');
+        lines.push('Napomena:');
+        lines.push(document.getElementById('notes').value || '-');
+        return lines.join('\n');
+      }
+
+      document.getElementById('sendEmail').addEventListener('click',()=>{
+        const subject = encodeURIComponent('Porudžbina — VeleTech');
+        const body = encodeURIComponent(build());
+        location.href = `mailto:veletech@proton.me?subject=${subject}&body=${body}`;
+      });
+
+      document.getElementById('download').addEventListener('click',()=>{
+        const blob = new Blob([build()],{type:'text/plain'});
+        const url = URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='porudzbina.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      });
+
+      document.getElementById('copy').addEventListener('click', async ()=>{
+        try{ await navigator.clipboard.writeText(build()); alert('Kopirano u clipboard'); }catch(e){ alert('Clipboard nije dostupan'); }
+      });
+    </script>
+  </body>
+</html>
