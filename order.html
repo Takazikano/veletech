@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="sr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Naruči — VeleTech</title>
+    <style>
+      body{font-family:Arial,Helvetica,sans-serif;background:#071320;color:#f4f7fb;margin:0;padding:2rem}
+      .box{max-width:900px;margin:0 auto;background:#071827;padding:1.2rem;border-radius:12px}
+      label{display:block;margin-top:.6rem;color:#98a8bc}
+      input,textarea,select{width:100%;padding:.6rem;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:transparent;color:inherit}
+      .row{display:flex;gap:1rem}
+      .row>div{flex:1}
+      .actions{display:flex;gap:1rem;margin-top:1rem}
+      .btn{padding:.6rem 1rem;border-radius:8px;background:linear-gradient(135deg,#4fd1c5,#8b5cf6);color:#041018;text-decoration:none;font-weight:700;border:none;cursor:pointer}
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <a href="index.html">← Nazad</a>
+      <h1>Naruči proizvod</h1>
+      <form id="orderForm" onsubmit="return false;">
+        <label>Proizvod</label>
+        <input id="product" name="product" disabled />
+        <label>Cena (eur)</label>
+        <input id="price" name="price" disabled />
+        <label>Ime i prezime</label>
+        <input id="name" name="name" required />
+        <label>Email</label>
+        <input id="email" name="email" type="email" required />
+        <label>Telefon</label>
+        <input id="phone" name="phone" type="tel" required />
+        <label>Adresa - Ulica i broj</label>
+        <input id="street" name="street" required />
+        <div class="row">
+          <div>
+            <label>Grad</label>
+            <input id="city" name="city" required />
+          </div>
+          <div>
+            <label>Poštanski broj</label>
+            <input id="postal" name="postal" required />
+          </div>
+        </div>
+        <label>Država</label>
+        <input id="country" name="country" value="Serbia" required disabled />
+        <label>Napomena (opciono)</label>
+        <textarea id="notes" rows="4"></textarea>
+        <div class="actions">
+          <button class="btn" id="sendEmail">Pošalji email</button>
+          <button class="btn" id="download">Preuzmi narudžbinu</button>
+          <button class="btn" id="copy">Kopiraj u clipboard</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      function qs(key){
+        return new URLSearchParams(location.search).get(key) || '';
+      }
+      document.getElementById('product').value = decodeURIComponent(qs('product'));
+      document.getElementById('price').value = decodeURIComponent(qs('price'));
+
+      function buildBody(){
+        const p=document.getElementById('product').value;
+        const price=document.getElementById('price').value;
+        const name=document.getElementById('name').value;
+        const email=document.getElementById('email').value;
+        const phone=document.getElementById('phone').value;
+        const street=document.getElementById('street').value;
+        const city=document.getElementById('city').value;
+        const postal=document.getElementById('postal').value;
+        const country=document.getElementById('country').value;
+        const notes=document.getElementById('notes').value;
+        return `Narudžbina: ${p}\nCena (eur): ${price}\n\nKupac: ${name}\nEmail: ${email}\nTelefon: ${phone}\nAdresa: ${street}, ${city} ${postal}, ${country}\n\nNapomene:\n${notes}`;
+      }
+
+      document.getElementById('sendEmail').addEventListener('click',()=>{
+        const subject = encodeURIComponent('Narudžbina: ' + document.getElementById('product').value);
+        const body = encodeURIComponent(buildBody());
+        location.href = `mailto:veletech@proton.me?subject=${subject}&body=${body}`;
+      });
+
+      document.getElementById('download').addEventListener('click',()=>{
+        const blob = new Blob([buildBody()],{type:'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'narudzbina.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      });
+
+      document.getElementById('copy').addEventListener('click',async ()=>{
+        try{await navigator.clipboard.writeText(buildBody()); alert('Kopirano u clipboard');}catch(e){alert('Clipboard nije dostupan');}
+      });
+    </script>
+  </body>
+</html>
